@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Distance Calculator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+</head>
+<body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <span class="mdl-layout-title">Distance Calculator</span>
+            </div>
+        </header>
+        <main class="mdl-layout__content">
+            <div class="mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Add Coordinates</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    <textarea class="mdl-textfield__input" id="coordinates" rows="4" cols="50"></textarea>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" type="button" onclick="addCoordinates()">Add Coordinates</button>
+                </div>
+            </div>
+            <div class="mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Total Distance</h2>
+                </div>
+                <div class="mdl-card__supporting-text" id="output"></div>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="calculateTotalDistance()">Calculate Total Distance</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        var route = [];
+
+        function addCoordinates() {
+            var coordinatesText = document.getElementById('coordinates').value;
+            var coordinatesArray = JSON.parse('[' + coordinatesText + ']');
+            if (Array.isArray(coordinatesArray) && coordinatesArray.length > 0) {
+                route = route.concat(coordinatesArray);
+                document.getElementById('coordinates').value = '';
+            }
+            console.log(route)
+        }
+
+        function calculateDistance(coord1, coord2) {
+            var lat1 = coord1[0];
+            var lon1 = coord1[1];
+            var lat2 = coord2[0];
+            var lon2 = coord2[1];
+
+            var R = 6371e3; // Earth radius in meters
+            var φ1 = lat1 * Math.PI / 180;
+            var φ2 = lat2 * Math.PI / 180;
+            var Δφ = (lat2 - lat1) * Math.PI / 180;
+            var Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            var a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                    Math.cos(φ1) * Math.cos(φ2) *
+                    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            var distance = R * c;
+            return distance;
+        }
+
+        function calculateTotalDistance() {
+            var totalDistance = 0;
+            for (var i = 0; i < route.length - 1; i++) {
+                var distance = calculateDistance(route[i], route[i + 1]);
+                totalDistance += distance;
+            }
+
+            document.getElementById('output').innerText = 'Total Distance: ' + totalDistance.toFixed(2) + ' meters';
+        }
+    </script>
+</body>
+</html>

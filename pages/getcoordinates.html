@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coordinates Every 5 Meters</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h3>Get Coordinates Every 5 Meters</h3>
+        <div class="row">
+            <div class="input-field col s6">
+                <input id="startEnd" type="text" class="validate">
+                <label for="startEnd">Start (Lat, Lng) - End (Lat, Lng)</label>
+            </div>
+        </div>
+        <button class="btn waves-effect waves-light" onclick="calculateCoordinates()">Calculate</button>
+        <button class="btn waves-effect waves-light" onclick="copyToClipboard()">Copy Result</button>
+        <ul id="coordinatesList" class="collection"></ul>
+    </div>
+
+    <script src="../js/getcoordinates.js"></script>
+</body>
+</html>

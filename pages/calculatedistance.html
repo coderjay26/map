@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance Calculator</title>
+    <!-- MDB CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.2.0/mdb.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Distance Calculator</h1>
+        <form id="distanceForm">
+            <div class="mb-4">
+                <label for="coordinates" class="form-label">Coordinates (comma-separated)</label>
+                <textarea class="form-control" id="coordinates" rows="3" placeholder="Latitude, Longitude
+Latitude, Longitude
+..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Calculate Distance</button>
+        </form>
+        <div id="result" class="mt-4"></div>
+        <div id="tresult" class="mt-4"></div>
+    </div>
+
+    <!-- MDB JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.2.0/mdb.min.js"></script>
+    <script src="../js/calculatedistance.js"></script>
+</body>
+
+</html>

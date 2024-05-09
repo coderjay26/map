@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nearest Route</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="js/route.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/algorithm.js"></script>
+    <script src="js/findroute.js"></script>
+    <script src="js/request.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map { height: calc(100vh - 40px) ; }
+        .text_marker{
+            background-color: #fff;
+            border: 2px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.5;
+        }
+        #search {
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #search input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        #search button {
+            background-color: #2196F3;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #search button:hover {
+            background-color: #1976D2;
+        }
+        .content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader h1 {
+            position: relative;
+            color: #262626;
+            font-size: 4em;
+            font-weight: bold;
+            letter-spacing: 5px;
+            border-bottom: 16px solid #262626;
+            line-height: 1.4;
+            text-transform: capitalize;
+        }
+        .loader h1::before {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            color: #0C356A;
+            border-bottom: 16px solid #0C356A;
+            animation: lod 2s linear infinite;
+            overflow: hidden;
+        }
+        @keyframes lod {
+            0% {
+                width: 0;
+            }
+            100% {
+                width: 100%;
+            }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+		<h1 data-text="Pryce...">Pryce...</h1>
+	</div>
+   <div class="content">
+    <div id="search">
+        <input id="grieveName" type="text" placeholder="Grieve"/>
+        <button id="searchbtn">Search</button>
+    </div>    
+    <div id="map"></div>
+   </div>
+    <script>
+            var polylines = [];
+        var isPoll = false;
+            var southWest = L.latLng(8.534123, 123.369477),
+                northEast = L.latLng(8.538415, 123.377588),
+                bounds = L.latLngBounds(southWest, northEast);
+
+            var map = L.map('map', {
+                center: [8.535954, 123.373309],
+                zoom: 15,
+                dragging: true,
+                zoomControl: false,
+                maxBounds: bounds,
+                scrollWheelZoom: false
+            });
+            // Add custom map image overlay
+            var customMapOverlay = L.imageOverlay('map.png', bounds).addTo(map);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            // function to get the route coordinates
+            function getRouteCoordinates(start, route,grieveArr, grieve) {
+                return [
+                    start,
+                    ...route,
+                    grieveArr,
+                    grieve
+                ];
+            }
+            
+            function searchGrieve(coor){
+                var distances;
+                var grieveArray = coor.split(',').map(parseFloat);
+                if(isPoll){
+                    console.log("sss")
+                    polylines.forEach(function (item) {
+                        map.removeLayer(item)
+                    });
+                }
+                var nearest = findNearestCoordinate(grieveArray, coordinates);
+                
+                console.log("Nearest coordinate:", nearest);
+                // Find the name of the array containing the coordinate
+                var arrayName = findArrayNameContainingCoordinate(nearest, arraysOfCoordinates);
+                console.log(arrayName)
+                if (arrayName !== null) {
+                    switch (arrayName) {
+                        case 'coordinate1':
+                            var routeCoordinates = getRouteCoordinates(start, route_coor1, nearest, grieveArray);
+                            console.log(findNearestCoordinate(trys, coordinate1))
+                            break;
+                        case 'coordinate2':
+                            var r = coordinate1.concat(coordinate1, coordinate2)
+                            var r1 = [start, ...route_coor2, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            //check what is nearest location or route
+                            if((calculateDistance(findNearestCoordinate(trys, r), trys)) < calculateDistance(trys, grieveArray))
+                            {
+                                userLoc(trys, findNearestCoordinate(trys, r))
+                            }else{
+                                userLoc(trys, grieveArray) 
+                            }
+                            var routeCoordinates = getRouteCoordinates(start, route_coor2, nearest, grieveArray);
+                            break;
+                        case 'coordinate3':
+                            var r = coordinate2.concat(coordinate2, coordinate3, coordinate4, coordinate4, coordinate6, coordinate7)
+                            var r1 = [start, ...route_coor3_1, nearest, grieveArray]
+                           
+                            distances = addCoordinates(r1)
+                             //check what is nearest location or route
+                             if((calculateDistance(findNearestCoordinate(trys, r), trys)) < calculateDistance(trys, grieveArray))
+                            {
+                                userLoc(trys, findNearestCoordinate(trys, r))
+                            }else{
+                                userLoc(trys, grieveArray) 
+                            }
+                           
+                            var routeCoordinates = getRouteCoordinates(start, route_coor3_1, nearest, grieveArray);
+                            break;
+                        case 'coordinate4':
+                            var r = coordinate2.concat(coordinate2, coordinate3, coordinate4, coordinate4, coordinate6, coordinate7)
+                            var r1 = [start, ...route_coor4, nearest, grieveArray]
+                           
+                            distances = addCoordinates(r1)
+                             //check what is nearest location or route
+                             if((calculateDistance(findNearestCoordinate(trys, r), trys)) < calculateDistance(trys, grieveArray))
+                            {
+                                userLoc(trys, findNearestCoordinate(trys, r))
+                            }else{
+                                userLoc(trys, grieveArray) 
+                            }
+                           
+                            var routeCoordinates = getRouteCoordinates(start, route_coor4, nearest, grieveArray);
+                            break;
+                        case 'coordinate5':
+                            var r = coordinate2.concat(coordinate2, coordinate3, coordinate4, coordinate4, coordinate6, coordinate7)
+                            var r1 = [start, ...route_coor4, nearest, grieveArray]
+                           
+                            distances = addCoordinates(r1)
+                             //check what is nearest location or route
+                             if((calculateDistance(findNearestCoordinate(trys, r), trys)) < calculateDistance(trys, grieveArray))
+                            {
+                                userLoc(trys, findNearestCoordinate(trys, r))
+                            }else{
+                                userLoc(trys, grieveArray) 
+                            }
+                           
+                            var routeCoordinates = getRouteCoordinates(start, route_coor4, nearest, grieveArray);
+                            break;
+                        case 'coordinate6':
+                            var r = coordinate2.concat(coordinate2, coordinate3, coordinate4, coordinate4, coordinate6, coordinate7)
+                            var r1 = [start, ...route_coor6, nearest, grieveArray]
+                           
+                            distances = addCoordinates(r1)
+                             //check what is nearest location or route
+                             console.log(calculateDistance(findNearestCoordinate(trys, r), trys))
+                             console.log(calculateDistance(trys, grieveArray))
+                             if((calculateDistance(findNearestCoordinate(trys, r), trys)) < calculateDistance(trys, grieveArray))
+                            {
+                                userLoc(trys, findNearestCoordinate(trys, r))
+                            }else{
+                                userLoc(trys, grieveArray) 
+                            }
+                           
+                            var routeCoordinates = getRouteCoordinates(start, route_coor6, nearest, grieveArray);
+                            break;
+                        case 'coordinate7':
+                            var r = coordinate2.concat(coordinate2, coordinate3, coordinate4, coordinate4, coordinate6, coordinate7)
+                            var r1 = [start, ...route_coor5, nearest, grieveArray]
+                            var r2 = [start, ...route_coor5_1, nearest, grieveArray]
+
+                            
+                             //check what is nearest location or route
+
+                             if((calculateDistance(findNearestCoordinate(trys, r), trys)) < calculateDistance(trys, grieveArray))
+                            {
+                                userLoc(trys, findNearestCoordinate(trys, r))
+                            }else{
+                                userLoc(trys, grieveArray) 
+                            }
+                           if(addCoordinates(r1) > addCoordinates(r2)){
+                            distances = addCoordinates(r2)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor5_1, nearest, grieveArray);
+                           }else{
+                            var routeCoordinates = getRouteCoordinates(start, route_coor5, nearest, grieveArray);
+                            distances = addCoordinates(r1)
+                           }
+                            break;
+                        case 'rcoordinate1':
+                            var r1 = [start, ...route_coor1r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor1r, nearest, grieveArray)
+                            break;
+                        case 'rcoordinate2':
+                            var r1 = [start, ...route_coor1r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor1r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate3':
+                            var r1 = [start, ...route_coor2r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor2r, nearest, grieveArray);
+                            break;
+                            case 'rcoordinate4':
+                            var r1 = [start, ...route_coor3r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor3r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate4_1':
+                            var r1 = [start, ...route_coor3r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor3r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate4_2':
+                            var r1 = [start, ...route_coor4r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor4r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate5':
+                            var r1 = [start, ...route_coor5, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor5r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate7': 
+                            var r1 = [start, ...route_coor6r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor6r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate8':
+                            var r1 = [start, ...route_coor7r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor7r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate9':
+                            var r1 = [start, ...route_coor8r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor8r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate10':
+                            var r1 = [start, ...route_coor9r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor9r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate10_1_0':
+                            var r1 = [start, ...route_coor10r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor10r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate10_1':
+                            var r1 = [start, ...route_coor11r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor11r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate11':
+                            var r1 = [start, ...route_coor12r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor12r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate12':
+                            var r1 = [start, ...route_coor13r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor13r, nearest, grieveArray);
+                            break;
+                        case 'rcoordinate12_1':
+                            var r1 = [start, ...route_coor14r, nearest, grieveArray]
+                            
+                            distances = addCoordinates(r1)
+                            var routeCoordinates = getRouteCoordinates(start, route_coor14r, nearest, grieveArray);
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    console.log("Coordinate is not inside any array.");
+                }
+                var polyline = L.polyline(routeCoordinates.slice(0, -1), { color: 'blue', weight: 10 }).addTo(map);
+                polylines.push(polyline);
+                var dottedPolyline = L.polyline([routeCoordinates[routeCoordinates.length - 2], grieveArray], { dashArray: '10, 10', color: 'blue', weight: 7 }).addTo(map);
+                polylines.push(dottedPolyline);
+                var destinationMarker = L.marker(grieveArray).addTo(map);
+                polylines.push(destinationMarker)
+
+                // Create a custom div icon with the text
+                var customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: '<div class="text_marker"><div style="color: red; font-weight: bold; font-size:20px;">'+distances+' meter/s</div></div>', 
+                    iconSize: [100, 100], // Size of the icon
+                    iconAnchor: [50, 0] // Position of the text within the icon
+                });
+
+                // Add the custom icon as a marker on the map
+                var textMarker = L.marker(grieveArray, { icon: customIcon }).addTo(map);
+                polylines.push(textMarker);
+                map.fitBounds(polyline.getBounds());
+                isPoll = true;
+            }
+            window.addEventListener('load', () =>{
+                //hide the loader
+                const loader = document.querySelector('.loader');
+                loader.style.display = 'none';
+
+                //show the content of the page
+                const content = document.querySelector('.content');
+                content.style.opacity = '1';
+            });
+        </script>
+</body>
+</html>
