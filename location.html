@@ -96,7 +96,7 @@ https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.81.0/dist/L.Control.Locate.
     $('#searchbtn').click(function() {
         var name = $('#grieveName').val();
         $.ajax({
-            url: 'http://192.168.254.148:8080/getCoordinate.php',
+            url: '/getCoordinate.php',
             type: 'GET',
             data: {name: name},
             success: function(response){

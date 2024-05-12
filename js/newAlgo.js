@@ -4,7 +4,6 @@ var markerUser;
 //8.537422, 123.372504
 
 //8.535098, 123.370551
-
 var polylines = [];
 map.addControl(
     L.control.locate({
@@ -14,12 +13,16 @@ map.addControl(
       }
     })
   );
+var user = [8.534408, 123.368267];
 var gr = [8.535230, 123.372276];
-async function showPosition(position) {
-    user = [position.coords.latitude, position.coords.longitude]
-     const nearestCoordinate = findNearestCoordinate(user, coordinatess);
+
+async function updatePathIfUserAvailable() {
+    const userLocation = await getUserLocation();
+    if (userLocation) {
+        const nearestCoordinate = findNearestCoordinate(userLocation, coordinatess);
+
         const nearestGCoordnate = findNearestCoordinate(grieve, coordinatess);
-        console.log(user)
+
         var usrNode = getNodeNameByValue(nodes, nearestCoordinate);
         var grieves = getNodeNameByValue(nodes, nearestGCoordnate)
 
@@ -27,11 +30,11 @@ async function showPosition(position) {
 
         let path = await getShortestPath(previous, grieves);
 
-        const x = document.getElementById("demo");
-
+        console.log(userLocation)
         var nearestPath = path.map(node => nodes[node]);
-        var pathCoordinates = [user, nearestCoordinate, ...nearestPath, nearestGCoordnate, gr]
-        var totalDistance = 0;
+
+        var pathCoordinates = [userLocation, nearestCoordinate, ...nearestPath, nearestGCoordnate, grieve]
+var totalDistance = 0;
         for (var i = 0; i < pathCoordinates.length - 1; i++) {
             var distances = calculateDistance(pathCoordinates[i], pathCoordinates[i + 1]);
             totalDistance += distances;
@@ -51,37 +54,19 @@ async function showPosition(position) {
             iconSize: [100, 100], // Size of the icon
             iconAnchor: [0, 0] // Position of the text within the icon
         });
-        polylines.push(customIcon)
-        var textMarker = L.marker(gr, { icon: customIcon }).addTo(map);
+        var textMarker = L.marker(grieve, { icon: customIcon }).addTo(map);
         polylines.push(customIcon);
         polylines.push(textMarker);
-        markerUser = L.circle(user).addTo(map);
+        markerUser = L.circle(userLocation).addTo(map);
         markerUser.bindPopup("You")
-        polylines.push(markerUser);
         markerGrieve = L.marker(grieve).addTo(map);
         markerGrieve.bindPopup("Grieve").openPopup();
-        polylines.push(markerGrieve);
-        pathPolyline = L.polyline(pathCoordinates, { color: 'blue' }).addTo(map);
-        polylines.push(pathPolyline);
-        // Fit the map to the path bounds
-        map.fitBounds(markerUser.getBounds());
-  }
-  getLocation()
-  function getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(showPosition);
-    } else {
-     console.log("Geolocation is not supported by this browser.");
-    }
-  }
-// async function updatePathIfUserAvailable() {
-//     var user = []
-//     const userLocation = await getUserLocation();
-//     if (userLocation) {
-
        
-//     }
-// }
+        pathPolyline = L.polyline(pathCoordinates, { color: 'blue' }).addTo(map);
+
+        map.fitBounds(markerUser.getBounds());
+    }
+}
 
 
 function getUserLocation() {
@@ -99,7 +84,6 @@ function getUserLocation() {
         );
     });
 }
-
 
 function calculateDistance(coord1, coord2) {
     var lat1 = coord1[0];
@@ -251,7 +235,6 @@ var coordinatess = [
 
     [8.535523, 123.372785], [8.535485, 123.372752], [8.535447, 123.372719], [8.535410, 123.372686], [8.535372, 123.372653], [8.535334, 123.372619], [8.535296, 123.372586], [8.535258, 123.372553], [8.535220, 123.372520], [8.535182, 123.372487], [8.535145, 123.372454], [8.535107, 123.372421], [8.535069, 123.372388], [8.535031, 123.372355], [8.534993, 123.372321], [8.534955, 123.372288], [8.534918, 123.372255], [8.534880, 123.372222], [8.534842, 123.372189]
 ];
-var polyline = L.polyline(coordinatess, { color: 'red', dashArray: '1, 5' }).addTo(map);
 
 let nodes = {};
 
@@ -426,5 +409,5 @@ let graph = {
     '164': { '163': 5, '165': 5 },
     '165': { '164': 5, '1': 5 }
 };
-// updatePathIfUserAvailable()
-//setInterval(updatePathIfUserAvailable, 3000); // 3000 milliseconds = 3 seconds
+
+setInterval(updatePathIfUserAvailable, 100); // 3000 milliseconds = 3 seconds
